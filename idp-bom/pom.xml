@@ -1,0 +1,303 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.mohankandar.idp</groupId>
+    <artifactId>idp-bom</artifactId>
+    <version>0.1.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>IDP :: BOM</name>
+    <description>Versions-only BOM for the IDP framework and apps.</description>
+
+    <properties>
+        <json.unit.version>2.38.0</json.unit.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
+        <spring-boot-dependencies.version>3.5.9</spring-boot-dependencies.version>
+        <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
+        <wiremock-standalone.version>3.13.2</wiremock-standalone.version>
+        <micrometer-bom.version>1.12.7</micrometer-bom.version>
+        <liquibase-core.version>4.29.2</liquibase-core.version>
+        <spring-kafka.version>3.1.4</spring-kafka.version>
+        <redisson.version>3.27.2</redisson.version>
+        <logback-classic.version>1.5.22</logback-classic.version>
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <ojdbc11.version>23.4.0.24.05</ojdbc11.version>
+        <mysql-connector-j.version>9.0.0</mysql-connector-j.version>
+        <postgresql.version>42.7.3</postgresql.version>
+        <junit-bom.version>5.10.2</junit-bom.version>
+        <testcontainers-bom.version>1.20.4</testcontainers-bom.version>
+        <embedded-redis.version>1.4.3</embedded-redis.version>
+        <jjwt-api.version>0.11.5</jjwt-api.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.8.13</springdoc-openapi-starter-webmvc-ui.version>
+        <janino.version>3.1.12</janino.version>
+        <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+        <cxf-rt-frontend-jaxws.version>4.0.4</cxf-rt-frontend-jaxws.version>
+        <spotbugs-annotations.version>4.8.3</spotbugs-annotations.version>
+        <datasource-proxy.version>1.11.0</datasource-proxy.version>
+    </properties>
+    <!-- Dependency versions only; no modules inherit this as a <parent>. -->
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Base BOMs (imported) -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Explicit leaf version: Nimbus is used by IDP test token helpers (legacy) -->
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>${nimbus-jose-jwt.version}</version>
+            </dependency>
+
+            <!-- WireMock (for idp-testing-stubs). Use the standalone jar to reduce dependency conflicts. -->
+            <dependency>
+                <groupId>org.wiremock</groupId>
+                <artifactId>wiremock-standalone</artifactId>
+                <version>${wiremock-standalone.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-bom</artifactId>
+                <version>${micrometer-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Core libs we want pinned (not all are in Boot BOM or we prefer explicit pins) -->
+            <dependency>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+                <version>${liquibase-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${spring-kafka.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+
+            <!-- Logging (apps opt-in; framework provides resources-only config) -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback-classic.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash-logback-encoder.version}</version>
+            </dependency>
+
+            <!-- JDBC drivers (apps opt-in) -->
+            <dependency>
+                <groupId>com.oracle.database.jdbc</groupId>
+                <artifactId>ojdbc11</artifactId>
+                <version>${ojdbc11.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>${mysql-connector-j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
+
+            <!-- Test stacks (import only; apps/modules reference without repeating versions) -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- ... other managed deps ... -->
+            <dependency>
+                <groupId>com.github.codemonstur</groupId>
+                <artifactId>embedded-redis</artifactId>
+                <version>${embedded-redis.version}</version>
+            </dependency>
+
+            <!-- JSON Web Token (JJWT) -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt-api.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>0.11.5</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.janino</groupId>
+                <artifactId>janino</artifactId>
+                <version>${janino.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.janino</groupId>
+                <artifactId>commons-compiler</artifactId>
+                <version>${janino.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.openapitools</groupId>
+                <artifactId>jackson-databind-nullable</artifactId>
+                <version>${jackson-databind-nullable.version}</version>
+            </dependency>
+
+            <!-- SOAP (CXF) -->
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-frontend-jaxws</artifactId>
+                <version>${cxf-rt-frontend-jaxws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-transports-http</artifactId>
+                <version>${cxf-rt-frontend-jaxws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-features-logging</artifactId>
+                <version>${cxf-rt-frontend-jaxws.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-annotations</artifactId>
+                <version>${spotbugs-annotations.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.ttddyy</groupId>
+                <artifactId>datasource-proxy</artifactId>
+                <version>${datasource-proxy.version}</version>
+            </dependency>
+
+            <!-- IDP artifacts (managed so consumer services do not need to specify versions) -->
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-autoconfigure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-logging-config</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Starters -->
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-starter-platform</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-starter-partner</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-starter-soap-partner</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-test-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-starter-security</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-starter-data</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-starter-data-jpa</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-starter-identity-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Low-level dependency bundles -->
+            <dependency>
+                <groupId>io.github.mohankandar.idp</groupId>
+                <artifactId>idp-data-jpa</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Testing dependencies -->
+            <dependency>
+                <groupId>net.javacrumbs.json-unit</groupId>
+                <artifactId>json-unit-assertj</artifactId>
+                <version>${json.unit.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+</project>

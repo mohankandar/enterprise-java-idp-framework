@@ -1,0 +1,7 @@
+io.github.mohankandar.idp.data.IdpDataAutoConfiguration
+io.github.mohankandar.idp.data.redis.RedisAutoConfiguration
+io.github.mohankandar.idp.data.redis.EmbeddedRedisAutoConfiguration
+io.github.mohankandar.idp.data.cache.IdpCacheAutoConfiguration
+io.github.mohankandar.idp.data.cache.IdpCacheActuatorAutoConfiguration
+
+io.github.mohankandar.idp.data.performance.IdpDataPerformanceAutoConfiguration

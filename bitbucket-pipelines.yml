@@ -1,0 +1,64 @@
+image: maven:3.9.8-eclipse-temurin-21
+
+options:
+  max-time: 60
+
+definitions:
+  caches:
+    maven: ~/.m2/repository
+  steps:
+    - step: &stage-a
+        name: Stage A
+        caches:
+          - maven
+        script:
+          - chmod +x .github/scripts/run_maven_stage.sh
+          - |
+            if [[ -n "${BITBUCKET_PR_DESTINATION_BRANCH:-}" ]]; then
+              if [[ "${BITBUCKET_PR_DESTINATION_BRANCH}" != "master" && "${BITBUCKET_PR_DESTINATION_BRANCH}" != *_Release && "${BITBUCKET_PR_DESTINATION_BRANCH}" != *-Release ]]; then
+                echo "Skipping Stage A for PR destination branch: ${BITBUCKET_PR_DESTINATION_BRANCH}"
+                exit 0
+              fi
+            fi
+          - ./.github/scripts/run_maven_stage.sh "Stage A" mvn -pl idp-core,idp-autoconfigure,idp-starter-data,idp-starter-security,idp-starter-platform -am -Dcoverage.guard.skip=false test
+        artifacts:
+          - stage-a.log
+
+    - step: &stage-b
+        name: Stage B
+        caches:
+          - maven
+        script:
+          - chmod +x .github/scripts/run_maven_stage.sh
+          - |
+            if [[ -n "${BITBUCKET_PR_DESTINATION_BRANCH:-}" ]]; then
+              if [[ "${BITBUCKET_PR_DESTINATION_BRANCH}" != "master" && "${BITBUCKET_PR_DESTINATION_BRANCH}" != *_Release && "${BITBUCKET_PR_DESTINATION_BRANCH}" != *-Release ]]; then
+                echo "Skipping Stage B for PR destination branch: ${BITBUCKET_PR_DESTINATION_BRANCH}"
+                exit 0
+              fi
+            fi
+          - ./.github/scripts/run_maven_stage.sh "Stage B" mvn -pl idp-demo-service -am -Dcoverage.guard.skip=false test
+        artifacts:
+          - stage-b.log
+
+    - step: &stage-d
+        name: Stage D
+        caches:
+          - maven
+        script:
+          - chmod +x .github/scripts/run_maven_stage.sh
+          - ./.github/scripts/run_maven_stage.sh "Stage D" mvn -Dtest.it.enabled=true -Dit.guard.skip=false -Dcoverage.guard.skip=false verify
+        artifacts:
+          - stage-d.log
+
+pipelines:
+  pull-requests:
+    "**":
+      - parallel:
+          - step: *stage-a
+          - step: *stage-b
+
+  custom:
+    nightly-stage-d:
+      - step: *stage-d
+

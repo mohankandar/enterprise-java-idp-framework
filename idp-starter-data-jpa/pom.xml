@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.mohankandar.idp</groupId>
+    <artifactId>idp-parent</artifactId>
+    <version>0.1.2-SNAPSHOT</version>
+    <relativePath>../idp-parent/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>idp-starter-data-jpa</artifactId>
+  <name>IDP :: Starter :: Data JPA</name>
+  <description>Backward-compatible starter that brings in IDP data starter + Spring Data JPA</description>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <!-- IDP data starter: cache, redis, liquibase, jdbc, etc. -->
+    <dependency>
+      <groupId>io.github.mohankandar.idp</groupId>
+      <artifactId>idp-starter-data</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- JPA API + Hibernate + Spring Data repositories -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <!-- Keep the shared JPA helpers available to apps (optional, but useful) -->
+    <dependency>
+      <groupId>io.github.mohankandar.idp</groupId>
+      <artifactId>idp-data-jpa</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+</project>

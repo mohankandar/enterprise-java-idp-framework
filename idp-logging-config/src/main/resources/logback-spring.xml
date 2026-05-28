@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false">
+
+    <turboFilter class="io.github.mohankandar.idp.platform.logging.MaskingTurboFilter"/>
+
+    <conversionRule conversionWord="maskedMsg"
+                    class="io.github.mohankandar.idp.platform.logging.MaskingMessageConverter"/>
+
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="idp-app"/>
+    <property name="APP_ENV" value="${IDP_LOG_APP_ENV:-${SPRING_PROFILES_ACTIVE:-default}}"/>
+    <property name="HOST_NAME" value="${HOSTNAME:-${COMPUTERNAME:-unknown-host}}"/>
+    <property name="PROCESS_ID" value="${PID:-unknown-pid}"/>
+    <property name="APP_VERSION" value="${APP_VERSION:-unknown-version}"/>
+    <property name="LOG_LEVEL" value="${LOG_LEVEL:-INFO}"/>
+    <property name="LOG_PATH" value="${LOG_PATH:-}"/>
+    <property name="LOG_FILE_ENABLED" value="${LOG_FILE_ENABLED:-false}"/>
+    <property name="LOG_CONSOLE_ENABLED" value="${LOG_CONSOLE_ENABLED:-true}"/>
+    <property name="ROLLING_MAX_HISTORY" value="${ROLLING_MAX_HISTORY:-14}"/>
+    <property name="ROLLING_MAX_FILE_SIZE" value="${ROLLING_MAX_FILE_SIZE:-50MB}"/>
+    <property name="TOTAL_SIZE_CAP" value="${TOTAL_SIZE_CAP:-2GB}"/>
+
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <fieldName>@timestamp</fieldName>
+                </timestamp>
+                <pattern>
+                    <omitEmptyFields>true</omitEmptyFields>
+                    <pattern>{
+                        "level":"%level",
+                        "logger":"%logger{36}",
+                        "thread":"%thread",
+                        "app":"${APP_NAME}",
+                        "app_env":"${APP_ENV}",
+                        "host":"${HOST_NAME}",
+                        "pid":"${PROCESS_ID}",
+                        "app_version":"${APP_VERSION}",
+                        "message":"%replace(%maskedMsg){'[\\r\\n]+',' '}"
+                        }
+                    </pattern>
+                </pattern>
+                <mdc/>
+                <stackTrace>
+                    <fieldName>stack_trace</fieldName>
+                </stackTrace>
+            </providers>
+        </encoder>
+    </appender>
+
+    <condition class="ch.qos.logback.core.boolex.PropertyEqualityCondition">
+        <key>LOG_FILE_ENABLED</key>
+        <value>true</value>
+    </condition>
+    <if>
+        <then>
+            <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>${LOG_PATH}/${APP_NAME}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                    <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                    <maxFileSize>${ROLLING_MAX_FILE_SIZE}</maxFileSize>
+                    <maxHistory>${ROLLING_MAX_HISTORY}</maxHistory>
+                    <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
+                </rollingPolicy>
+                <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <timestamp>
+                            <fieldName>@timestamp</fieldName>
+                        </timestamp>
+                        <pattern>
+                            <omitEmptyFields>true</omitEmptyFields>
+                            <pattern>{
+                                "level":"%level",
+                                "logger":"%logger{36}",
+                                "thread":"%thread",
+                                "app":"${APP_NAME}",
+                                "app_env":"${APP_ENV}",
+                                "host":"${HOST_NAME}",
+                                "pid":"${PROCESS_ID}",
+                                "app_version":"${APP_VERSION}",
+                                "message":"%replace(%maskedMsg){'[\\r\\n]+',' '}"
+                                }
+                            </pattern>
+                        </pattern>
+                        <mdc/>
+                        <stackTrace>
+                            <fieldName>stack_trace</fieldName>
+                        </stackTrace>
+                    </providers>
+                </encoder>
+            </appender>
+        </then>
+    </if>
+
+    <logger name="oracle.jdbc" level="WARN"/>
+    <logger name="org.hibernate.orm.jdbc.bind" level="WARN"/>
+    <logger name="com.zaxxer.hikari" level="INFO"/>
+
+    <condition class="ch.qos.logback.core.boolex.PropertyEqualityCondition">
+        <key>LOG_FILE_ENABLED</key>
+        <value>true</value>
+    </condition>
+    <if>
+        <then>
+            <condition class="ch.qos.logback.core.boolex.PropertyEqualityCondition">
+                <key>LOG_CONSOLE_ENABLED</key>
+                <value>true</value>
+            </condition>
+            <if>
+                <then>
+                    <root level="${LOG_LEVEL}">
+                        <appender-ref ref="JSON_CONSOLE"/>
+                        <appender-ref ref="JSON_FILE"/>
+                    </root>
+                </then>
+                <else>
+                    <root level="${LOG_LEVEL}">
+                        <appender-ref ref="JSON_FILE"/>
+                    </root>
+                </else>
+            </if>
+        </then>
+        <else>
+            <root level="${LOG_LEVEL}">
+                <appender-ref ref="JSON_CONSOLE"/>
+            </root>
+        </else>
+    </if>
+
+</configuration>

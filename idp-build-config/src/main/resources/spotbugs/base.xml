@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+
+  <!-- Generated code must not drive consumer build quality policy. -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,MS_MUTABLE_ARRAY,RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE,REC_CATCH_EXCEPTION,DE_MIGHT_IGNORE,CT_CONSTRUCTOR_THROW"/>
+    <Class name="~.*\.generated\..*"/>
+  </Match>
+
+  <!-- Extra safety for generated-source paths when class/package matching is inconsistent. -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,MS_MUTABLE_ARRAY,RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE,REC_CATCH_EXCEPTION,DE_MIGHT_IGNORE,CT_CONSTRUCTOR_THROW"/>
+    <Source name="~.*[\\/](generated|generated-sources)[\\/].*"/>
+  </Match>
+
+  <!-- Spring-managed beans receive collaborators via constructor injection.
+       Storing an injected @ConfigurationProperties, @Component, or @Service reference
+       is intentional — Spring owns the lifecycle, defensive copies are wrong here. -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+    <Method name="&lt;init&gt;"/>
+    <Class name="~.*(Service|Controller|Repository|Config|Configuration|Factory|Handler|Client|Validator|Filter|Adapter|Resolver|Interceptor|Converter|Provider)$"/>
+  </Match>
+
+  <!-- JPA/Hibernate entities intentionally expose managed references (bi-directional
+       relationships, proxies, embedded IDs). Defensive copies break Hibernate behaviour. -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    <Class name="~.*\.domain\.entity\..*"/>
+  </Match>
+
+</FindBugsFilter>

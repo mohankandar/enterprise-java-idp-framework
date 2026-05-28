@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.mohankandar.idp</groupId>
+        <artifactId>idp-parent</artifactId>
+        <version>0.1.2-SNAPSHOT</version>
+        <relativePath>../idp-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>idp-starter-partner</artifactId>
+    <version>0.1.2-SNAPSHOT</version>
+    <name>IDP :: Starter :: Partner</name>
+    <description>Unified Partner configuration + REST partner client factory (WebClient)</description>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.mohankandar.idp</groupId>
+            <artifactId>idp-starter-platform</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Optional: token propagation from Spring Security context -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Optional: OpenFeign (compile-time only; consumer decides if Feign is used) -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-openfeign-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+    </dependencies>
+</project>

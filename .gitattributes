@@ -1,0 +1,15 @@
+# Default: Windows line endings
+* text=auto eol=crlf
+
+# Shell scripts must stay LF (important if ever used in Docker/Linux)
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Maven wrapper (if present)
+mvnw text eol=lf
+
+# Keep binaries untouched
+*.jar binary
+*.png binary
+*.jpg binary
+*.gif binary

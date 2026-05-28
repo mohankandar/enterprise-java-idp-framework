@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.mohankandar.idp</groupId>
+    <artifactId>idp-parent</artifactId>
+    <version>0.1.2-SNAPSHOT</version>
+    <relativePath>../idp-parent/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>idp-starter-data</artifactId>
+  <version>0.1.2-SNAPSHOT</version>
+  <name>IDP :: Starter :: Data</name>
+  <description>Data starter (JPA, JDBC, Liquibase, Redis) with optional embedded Redis for local</description>
+
+  <properties>
+    <test.coverage.enabled>false</test.coverage.enabled>
+    <test.failIfNoTests>false</test.failIfNoTests>
+  </properties>
+
+  <dependencies>
+    <!-- Core Spring data bits -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+
+      <dependency>
+          <groupId>com.github.spotbugs</groupId>
+          <artifactId>spotbugs-annotations</artifactId>
+          <scope>provided</scope>
+      </dependency>
+
+      <!--
+        Spring Data JPA stack (Jakarta Persistence + Hibernate + Spring Data).
+        Required for services that define @Entity / JpaRepository.
+        Apps that truly don't use JPA can exclude this dependency.
+      -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <!-- Liquibase (Boot autoconfig kicks in when this is present) -->
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+    </dependency>
+
+    <!-- Redis (connection + template). Apps can set spring.cache.type=redis if they want CacheManager -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+
+    <!-- Spring Cache abstraction (CacheManager + @Cacheable) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-cache</artifactId>
+    </dependency>
+
+    <!-- Optional actuator health indicator for cache. Only used if the consuming app includes actuator. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Optional: embedded Redis for local dev (class: redis.embedded.RedisServer).
+         Kept optional so it never leaks into prod images. -->
+    <dependency>
+      <groupId>com.github.codemonstur</groupId>
+      <artifactId>embedded-redis</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Our shared glue -->
+    <dependency>
+      <groupId>io.github.mohankandar.idp</groupId>
+      <artifactId>idp-autoconfigure</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.mohankandar.idp</groupId>
+      <artifactId>idp-data-jpa</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.mohankandar.idp</groupId>
+      <artifactId>idp-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.mohankandar.idp</groupId>
+      <artifactId>idp-starter-platform</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.ttddyy</groupId>
+      <artifactId>datasource-proxy</artifactId>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>io.github.mohankandar.idp</groupId>
+      <artifactId>idp-test-lib</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

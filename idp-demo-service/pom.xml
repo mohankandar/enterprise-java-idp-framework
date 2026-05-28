@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.mohankandar.idp</groupId>
+        <artifactId>idp-parent</artifactId>
+        <version>0.1.2-SNAPSHOT</version>
+        <relativePath>../idp-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>idp-demo-service</artifactId>
+    <version>0.1.2-SNAPSHOT</version>
+    <name>IDP :: Demo Service</name>
+    <description>Demo exercising all IDP framework modules</description>
+    <packaging>jar</packaging>
+
+    <properties>
+        <test.coverage.enabled>true</test.coverage.enabled>
+        <test.coverage.line.minimum>0.10</test.coverage.line.minimum>
+        <test.coverage.branch.minimum>0.05</test.coverage.branch.minimum>
+        <test.failIfNoTests>true</test.failIfNoTests>
+    </properties>
+
+    <dependencies>
+        <!-- IDP framework -->
+        <dependency>
+            <groupId>io.github.mohankandar.idp</groupId>
+            <artifactId>idp-starter-platform</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mohankandar.idp</groupId>
+            <artifactId>idp-starter-security</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mohankandar.idp</groupId>
+            <artifactId>idp-data-jpa</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mohankandar.idp</groupId>
+            <artifactId>idp-starter-data</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mohankandar.idp</groupId>
+            <artifactId>idp-starter-identity-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mohankandar.idp</groupId>
+            <artifactId>idp-starter-soap-partner</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- DB driver: H2 for local/demo -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Web clients (optional) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
+        <!-- JPA -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.codemonstur</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>io.github.mohankandar.idp</groupId>
+            <artifactId>idp-test-lib</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.4.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-openapi-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <generatorName>spring</generatorName>
+                            <library>spring-boot</library>
+
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/api.yml</inputSpec>
+                            <apiPackage>io.github.mohankandar.idp.demo.generated.api</apiPackage>
+                            <modelPackage>io.github.mohankandar.idp.demo.generated.model</modelPackage>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+
+                            <configOptions>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <useTags>true</useTags>
+                                <interfaceOnly>true</interfaceOnly>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <useBeanValidation>true</useBeanValidation>
+                                <dateLibrary>java8</dateLibrary>
+                                <openApiNullable>false</openApiNullable>
+                            </configOptions>
+
+                            <!-- Map OpenAPI ErrorDetail/ErrorResponse to IDP core types -->
+                            <importMappings>
+                                <importMapping>ErrorDetail=io.github.mohankandar.idp.core.api.ErrorDetail</importMapping>
+                                <importMapping>ErrorResponse=io.github.mohankandar.idp.core.api.ApiResponse</importMapping>
+                            </importMappings>
+
+                            <typeMappings>
+                                <typeMapping>ErrorDetail=io.github.mohankandar.idp.core.api.ErrorDetail</typeMapping>
+                                <typeMapping>ErrorResponse=io.github.mohankandar.idp.core.api.ApiResponse</typeMapping>
+                            </typeMappings>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <version>4.0.5</version>
+                <executions>
+                    <execution>
+                        <id>generate-hello-soap</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>${project.basedir}/src/main/resources/wsdl/hello.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-p</extraarg>
+                                        <extraarg>io.github.mohankandar.idp.demo.soap.hello</extraarg>
+                                        <extraarg>-mark-generated</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
+                            </wsdlOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

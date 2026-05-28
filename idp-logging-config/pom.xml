@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.mohankandar.idp</groupId>
+        <artifactId>idp-parent</artifactId>
+        <version>0.1.2-SNAPSHOT</version>
+        <relativePath>../idp-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>idp-logging-config</artifactId>
+    <version>0.1.2-SNAPSHOT</version>
+    <name>IDP :: Logging :: Config</name>
+    <description>Unified JSON logging (Logback + masking)</description>
+
+    <dependencies>
+        <!-- Logback is brought by Spring Boot; we add the JSON encoder -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+        </dependency>
+
+        <!-- Needed at compile time for TurboFilter & SPI -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <!-- Brought transitively by logback-classic, but safe to declare -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Use MaskingUtil from core -->
+        <dependency>
+            <groupId>io.github.mohankandar.idp</groupId>
+            <artifactId>idp-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+</project>

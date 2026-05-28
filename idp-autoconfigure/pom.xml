@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.mohankandar.idp</groupId>
+        <artifactId>idp-parent</artifactId>
+        <version>0.1.2-SNAPSHOT</version>
+        <relativePath>../idp-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>idp-autoconfigure</artifactId>
+    <version>0.1.2-SNAPSHOT</version>
+    <name>IDP :: Autoconfigure</name>
+    <description>Shared auto-configuration glue for IDP starters</description>
+
+    <properties>
+        <test.coverage.enabled>false</test.coverage.enabled>
+        <test.failIfNoTests>false</test.failIfNoTests>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mohankandar.idp</groupId>
+            <artifactId>idp-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Only used if Jackson is on the classpath (conditional) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Processor to generate metadata for @ConfigurationProperties (compile-time only) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>io.github.mohankandar.idp</groupId>
+            <artifactId>idp-test-lib</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

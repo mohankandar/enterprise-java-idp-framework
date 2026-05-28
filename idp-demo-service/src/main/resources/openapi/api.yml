@@ -1,0 +1,423 @@
+openapi: 3.0.3
+info:
+  title: IDP Demo Service API
+  version: 1.0.0
+  description: Demo service that showcases IDP response envelope, errors, and HTTP clients.
+
+paths:
+  /api/ping:
+    get:
+      summary: Simple health check
+      tags: [System]
+      responses:
+        '200':
+          description: Pong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/me:
+    get:
+      summary: Get current identity
+      tags: [Identity]
+      security:
+        - bearerAuth: []
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Current user identity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/customers:
+    get:
+      summary: Search customers with optional filters and paging
+      tags: [Customers]
+      parameters:
+        - in: query
+          name: name
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: emailContains
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: createdAfter
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - in: query
+          name: size
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+      responses:
+        '200':
+          description: Paged list of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPageResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Create a customer
+      tags: [Customers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDto'
+      responses:
+        '200':
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/customers/{id}:
+    get:
+      summary: Get a customer by ID
+      tags: [Customers]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Customer found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      summary: Update a customer
+      tags: [Customers]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDto'
+      responses:
+        '200':
+          description: Customer updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      summary: Delete a customer
+      tags: [Customers]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Customer deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/downstream/ping:
+    get:
+      summary: Call downstream echo service via WebClient
+      tags: [Downstream]
+      responses:
+        '200':
+          description: Response from downstream echo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownstreamPingResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/downstream/external/resttemplate:
+    get:
+      summary: Call external httpbin using RestTemplate
+      tags: [DownstreamExternal]
+      responses:
+        '200':
+          description: External response (RestTemplate)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalEchoResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/downstream/external/webclient:
+    get:
+      summary: Call external httpbin using WebClient
+      tags: [DownstreamExternal]
+      responses:
+        '200':
+          description: External response (WebClient)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalEchoResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/downstream/external/feign:
+    get:
+      summary: Call external httpbin using Feign
+      tags: [DownstreamExternal]
+      responses:
+        '200':
+          description: External response (Feign)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalEchoResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /internal/echo:
+    get:
+      summary: Echo back selected request headers (internal debugging)
+      tags: [Internal]
+      responses:
+        '200':
+          description: Header echo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EchoResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  responses:
+    BadRequest:
+      description: Validation or client error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Authentication failed or missing token/API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Caller is authenticated but not allowed to do this
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Requested resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    # Domain models (docs only)
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CustomerDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+
+    CustomerPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+
+    # IDP-style error / envelope (for docs; mapped to core classes in codegen)
+    ErrorDetail:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    ErrorResponse:
+      type: object
+      description: Matches ApiResponse<?> on error
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+        data:
+          nullable: true
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+        timestamp:
+          type: string
+          format: date-time
+        correlationId:
+          type: string
+
+    PingResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+      description: ApiResponse<String>
+      properties:
+        data:
+          type: string
+          example: pong
+
+    MeResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+      description: ApiResponse<IdpIdentity>
+      properties:
+        data:
+          type: object
+          description: Identity fields (matches IdpIdentity)
+
+    CustomerResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+      description: ApiResponse<Customer>
+      properties:
+        data:
+          $ref: '#/components/schemas/Customer'
+
+    CustomerPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+      description: ApiResponse<CustomerPage>
+      properties:
+        data:
+          $ref: '#/components/schemas/CustomerPage'
+
+    DownstreamPingResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+      description: ApiResponse<Object> from downstream echo
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+
+    ExternalEchoResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+      description: ApiResponse<Object> from external httpbin calls
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+
+    EchoResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+      description: ApiResponse<Map<String,String>> for /internal/echo
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            type: string

@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: idp-demo-service
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  data:
+    redis:
+      repositories:
+        enabled: false  # opt-in only; caching still works
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
+
+# --- Security (defaults; override per env) ---
+idp:
+  security:
+    api-key:
+      # Authentication is ALWAYS ON at framework level.
+      # Header name is constant across all apps/envs:
+      header: X-API-Key
+      # Do NOT put the key here. Supply per-environment.
+  openapi:
+    enabled: true
+    global-security: true
+  identity:
+    http-enabled: false              # enable in non-local to enrich via HTTP
+  data:
+    redis:
+      embedded:
+        enabled: true                # local-only embedded Redis (from starter)
+        port: 6379
+
+springdoc:
+  swagger-ui:
+    display-request-duration: true
+    filter: true
+
+logging:
+  level:
+    root: INFO
+    io.github.mohankandar.idp: INFO
+    # Quiet common framework chatter
+    org.apache.catalina: WARN
+    org.apache.coyote: WARN
+    org.springframework.web.servlet.DispatcherServlet: WARN
+    org.springframework.boot.web.servlet: WARN
+    org.springframework.data.repository.config: WARN
+    org.springframework.boot.actuate.endpoint.web: WARN
+    org.springframework.security: WARN
+    liquibase: WARN
+    org.springframework.orm.jpa: WARN
+    org.hibernate: WARN
+    org.hibernate.orm.deprecation: ERROR

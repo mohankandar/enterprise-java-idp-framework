@@ -1,0 +1,40 @@
+spring:
+  # Use your real DB if applicable (or leave to config-server/env)
+  # datasource:
+  #   url: jdbc:oracle:thin:@//dev-host:1521/ORCLCDB
+  #   driver-class-name: oracle.jdbc.OracleDriver
+  #   username: APP_USER
+  #   password: ${DB_PASSWORD}
+  # jpa:
+  #   database-platform: org.hibernate.dialect.OracleDialect
+
+  data:
+    redis:
+      host: your-dev-redis-host
+      port: 6379
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,env,loggers"
+
+idp:
+  security:
+    api-key:
+      value: ${IDP_API_KEY}  # set in DEV secrets/store
+  identity:
+    http-enabled: true       # allow identity enrichment via HTTP in dev (optional)
+
+  data:
+    redis:
+      embedded:
+        enabled: false       # never start embedded in dev
+        port: 6379
+        only-when-local-profile: true

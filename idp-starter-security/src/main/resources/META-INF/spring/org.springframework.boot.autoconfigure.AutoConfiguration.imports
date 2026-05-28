@@ -1,0 +1,5 @@
+io.github.mohankandar.idp.security.SecurityAutoConfiguration
+io.github.mohankandar.idp.security.MethodSecurityAutoConfiguration
+io.github.mohankandar.idp.security.propagation.TokenPropagationWebClientConfig
+io.github.mohankandar.idp.security.propagation.TokenPropagationRestTemplateConfig
+io.github.mohankandar.idp.security.token.IdpTokenEndpointAutoConfiguration

@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.mohankandar.idp</groupId>
+    <artifactId>enterprise-java-idp-framework</artifactId>
+    <version>0.1.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>IDP :: Root Aggregator</name>
+    <description>Aggregates all IDP framework modules.</description>
+
+    <properties>
+        <cxf.version>4.0.4</cxf.version>
+    </properties>
+
+    <modules>
+        <module>idp-bom</module>
+        <module>idp-build-config</module>
+        <module>idp-parent</module>
+        <module>idp-core</module>
+        <module>idp-autoconfigure</module>
+        <module>idp-logging-config</module>
+        <module>idp-data-jpa</module>
+        <module>idp-starter-data</module>
+        <module>idp-starter-data-jpa</module>
+        <module>idp-starter-identity-client</module>
+        <module>idp-starter-security</module>
+        <module>idp-starter-platform</module>
+        <module>idp-starter-partner</module>
+        <module>idp-starter-soap-partner</module>
+        <module>idp-test-lib</module>
+        <module>idp-demo-service</module>
+    </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-codegen-plugin</artifactId>
+                    <version>${cxf.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

@@ -1,0 +1,40 @@
+spring:
+  # datasource:
+  #   url: jdbc:oracle:thin:@//test-host:1521/ORCLCDB
+  #   driver-class-name: oracle.jdbc.OracleDriver
+  #   username: APP_USER
+  #   password: ${DB_PASSWORD}
+  # jpa:
+  #   database-platform: org.hibernate.dialect.OracleDialect
+
+  data:
+    redis:
+      host: your-test-redis-host
+      port: 6379
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+
+idp:
+  security:
+    api-key:
+      value: ${IDP_API_KEY}  # set in TEST secrets/store
+
+  identity:
+    http-enabled: true       # or false if your test env doesn’t have identity
+
+  data:
+    redis:
+      embedded:
+        enabled: false       # never start embedded in test
+        port: 6379
+        only-when-local-profile: true

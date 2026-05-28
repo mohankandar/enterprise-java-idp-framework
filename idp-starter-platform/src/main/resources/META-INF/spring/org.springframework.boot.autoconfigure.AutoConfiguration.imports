@@ -1,0 +1,8 @@
+io.github.mohankandar.idp.platform.PlatformAutoConfiguration
+io.github.mohankandar.idp.platform.openapi.IdpOpenApiSecurityAutoConfiguration
+io.github.mohankandar.idp.platform.web.IdpWebErrorAutoConfiguration
+io.github.mohankandar.idp.platform.http.RestTemplateConfig
+io.github.mohankandar.idp.platform.http.WebClientConfig
+io.github.mohankandar.idp.platform.http.feign.IdpFeignAutoConfiguration
+
+io.github.mohankandar.idp.platform.performance.IdpPerformanceAutoConfiguration

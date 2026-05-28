@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+
+  <!-- Generated code must not drive consumer build quality policy. -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,MS_MUTABLE_ARRAY,RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE,REC_CATCH_EXCEPTION,DE_MIGHT_IGNORE,CT_CONSTRUCTOR_THROW"/>
+    <Class name="~.*\.generated\..*"/>
+  </Match>
+
+  <!-- Extra safety for generated-source paths when class/package matching is inconsistent. -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,MS_MUTABLE_ARRAY,RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE,REC_CATCH_EXCEPTION,DE_MIGHT_IGNORE,CT_CONSTRUCTOR_THROW"/>
+    <Source name="~.*[\\/](generated|generated-sources)[\\/].*"/>
+  </Match>
+
+</FindBugsFilter>

@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.github.mohankandar.idp</groupId>
+  <artifactId>idp-parent</artifactId>
+  <version>0.1.2-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>IDP :: Parent</name>
+  <description>Common parent POM for all IDP modules and apps.</description>
+
+  <!-- Global properties -->
+  <properties>
+    <idp.framework.version>0.1.2-SNAPSHOT</idp.framework.version>
+    <cxf.version>4.2.0</cxf.version>
+    <java.version>21</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>${java.version}</maven.compiler.release>
+
+    <!-- Plugin versions -->
+    <plugin.version.compiler>3.11.0</plugin.version.compiler>
+    <plugin.version.surefire>3.2.5</plugin.version.surefire>
+    <plugin.version.failsafe>3.2.5</plugin.version.failsafe>
+    <plugin.version.jacoco>0.8.11</plugin.version.jacoco>
+    <plugin.version.spring-boot>3.5.9</plugin.version.spring-boot>
+    <plugin.version.flatten>1.5.0</plugin.version.flatten>
+    <plugin.version.checkstyle>3.3.1</plugin.version.checkstyle>
+    <plugin.version.spotbugs>4.8.6.2</plugin.version.spotbugs>
+
+    <!-- Generic test / coverage policy defaults -->
+    <test.coverage.enabled>false</test.coverage.enabled>
+    <test.coverage.line.minimum>0.00</test.coverage.line.minimum>
+    <test.coverage.branch.minimum>0.00</test.coverage.branch.minimum>
+    <test.failIfNoTests>false</test.failIfNoTests>
+    <test.it.enabled>false</test.it.enabled>
+    <test.it.failIfNoTests>false</test.it.failIfNoTests>
+    <!-- JaCoCo stays on by default so coverage data exists whenever tests run. -->
+    <jacoco.skip>false</jacoco.skip>
+    <skipITs>true</skipITs>
+    <!-- Hard guardrail: consumer apps flip this to false when they want the gate enforced. -->
+    <coverage.guard.skip>true</coverage.guard.skip>
+    <it.guard.skip>true</it.guard.skip>
+
+    <!-- Static analysis gate defaults -->
+    <static.analysis.enabled>true</static.analysis.enabled>
+    <static.analysis.skip>false</static.analysis.skip>
+    <checkstyle.skip>false</checkstyle.skip>
+    <spotbugs.skip>false</spotbugs.skip>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
+    <spotbugs.failOnError>true</spotbugs.failOnError>
+    <idp.spotbugs.filter.file>spotbugs/base.xml</idp.spotbugs.filter.file>
+    <idp.spotbugs.jpa-entities>false</idp.spotbugs.jpa-entities>
+  </properties>
+
+  <!-- Centralize library versions via your BOM -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.github.mohankandar.idp</groupId>
+        <artifactId>idp-bom</artifactId>
+        <version>0.1.2-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Active in all children; enforcement itself is controlled by properties. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>fail-if-no-surefire-reports</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <skip>${coverage.guard.skip}</skip>
+              <target>
+                <resourcecount property="surefireXmlCount">
+                  <fileset dir="${project.build.directory}/surefire-reports" includes="TEST-*.xml"
+                           erroronmissingdir="false"/>
+                </resourcecount>
+                <fail message="No Surefire XML reports were produced. Unit tests did not run.">
+                  <condition>
+                    <equals arg1="${surefireXmlCount}" arg2="0"/>
+                  </condition>
+                </fail>
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>fail-if-no-failsafe-reports</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <skip>${it.guard.skip}</skip>
+              <target>
+                <resourcecount property="failsafeXmlCount">
+                  <fileset dir="${project.build.directory}/failsafe-reports"
+                           includes="TEST-*.xml,testng-results.xml,*.xml" erroronmissingdir="false"/>
+                </resourcecount>
+                <fail message="No Failsafe XML reports were produced. Integration tests did not run.">
+                  <condition>
+                    <equals arg1="${failsafeXmlCount}" arg2="0"/>
+                  </condition>
+                </fail>
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>fail-if-no-jacoco-ut-data</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <skip>${coverage.guard.skip}</skip>
+              <target>
+                <condition property="jacocoUtMissing">
+                  <not>
+                    <available file="${project.build.directory}/jacoco-ut.exec"/>
+                  </not>
+                </condition>
+                <fail if="jacocoUtMissing"
+                      message="JaCoCo unit-test exec file is missing. Unit tests did not produce coverage data."/>
+                <length file="${project.build.directory}/jacoco-ut.exec" property="jacocoUtSize"/>
+                <fail message="JaCoCo unit-test exec file is empty. Unit tests did not produce coverage data.">
+                  <condition>
+                    <equals arg1="${jacocoUtSize}" arg2="0"/>
+                  </condition>
+                </fail>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+              <plugin>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-codegen-plugin</artifactId>
+        <version>${cxf.version}</version>
+      </plugin>
+<!-- Java 21 compilation -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${plugin.version.compiler}</version>
+          <configuration>
+            <release>${java.version}</release>
+            <showDeprecation>true</showDeprecation>
+            <showWarnings>true</showWarnings>
+          </configuration>
+        </plugin>
+
+        <!-- Unit tests -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${plugin.version.surefire}</version>
+          <configuration>
+            <useModulePath>false</useModulePath>
+            <failIfNoTests>${test.failIfNoTests}</failIfNoTests>
+            <!-- JaCoCo agent is injected via surefireArgLine when coverage is enabled -->
+            <argLine>${surefireArgLine}</argLine>
+            <!-- Keep integration tests out of unit-test phase -->
+            <excludedGroups>it</excludedGroups>
+          </configuration>
+        </plugin>
+
+        <!-- Integration tests (if any module wants them) -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${plugin.version.failsafe}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <skipITs>${skipITs}</skipITs>
+            <failIfNoTests>${test.it.failIfNoTests}</failIfNoTests>
+            <includes>
+              <include>**/*IT.java</include>
+            </includes>
+            <groups>it</groups>
+            <!-- JaCoCo agent is injected via failsafeArgLine when coverage is enabled -->
+            <argLine>${failsafeArgLine}</argLine>
+          </configuration>
+        </plugin>
+
+        <!-- Code coverage -->
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${plugin.version.jacoco}</version>
+          <configuration>
+            <skip>${jacoco.skip}</skip>
+            <excludes>
+              <exclude>**/generated/**</exclude>
+              <exclude>**/*Application.class</exclude>
+              <exclude>**/dto/**</exclude>
+              <exclude>**/model/**</exclude>
+              <exclude>**/config/**</exclude>
+              <exclude>**/domain/entity/**</exclude>
+            </excludes>
+          </configuration>
+          <executions>
+            <execution>
+              <id>prepare-ut-agent</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+              <configuration>
+                <skip>${jacoco.skip}</skip>
+                <destFile>${project.build.directory}/jacoco-ut.exec</destFile>
+                <propertyName>surefireArgLine</propertyName>
+              </configuration>
+            </execution>
+            <execution>
+              <id>prepare-it-agent</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+              <configuration>
+                <skip>${jacoco.skip}</skip>
+                <destFile>${project.build.directory}/jacoco-it.exec</destFile>
+                <propertyName>failsafeArgLine</propertyName>
+              </configuration>
+            </execution>
+            <execution>
+              <id>merge-ut-it</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>merge</goal>
+              </goals>
+              <configuration>
+                <skip>${jacoco.skip}</skip>
+                <fileSets>
+                  <fileSet>
+                    <directory>${project.build.directory}</directory>
+                    <includes>
+                      <include>jacoco-ut.exec</include>
+                      <include>jacoco-it.exec</include>
+                    </includes>
+                  </fileSet>
+                </fileSets>
+                <destFile>${project.build.directory}/jacoco.exec</destFile>
+              </configuration>
+            </execution>
+            <execution>
+              <id>report</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+              <configuration>
+                <skip>${jacoco.skip}</skip>
+                <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                <outputDirectory>${project.build.directory}/jacoco-report</outputDirectory>
+                <formats>
+                  <format>HTML</format>
+                  <format>XML</format>
+                </formats>
+              </configuration>
+            </execution>
+            <execution>
+              <id>check</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <configuration>
+                <skip>${jacoco.skip}</skip>
+                <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                <rules>
+                  <rule>
+                    <element>BUNDLE</element>
+                    <limits>
+                      <limit>
+                        <counter>LINE</counter>
+                        <value>COVEREDRATIO</value>
+                        <minimum>${test.coverage.line.minimum}</minimum>
+                      </limit>
+                      <limit>
+                        <counter>BRANCH</counter>
+                        <value>COVEREDRATIO</value>
+                        <minimum>${test.coverage.branch.minimum}</minimum>
+                      </limit>
+                    </limits>
+                  </rule>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- Static analysis: baseline rules enforced for all consumer apps -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>${plugin.version.checkstyle}</version>
+          <dependencies>
+            <dependency>
+              <groupId>io.github.mohankandar.idp</groupId>
+              <artifactId>idp-build-config</artifactId>
+              <version>${idp.framework.version}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <skip>${checkstyle.skip}</skip>
+            <consoleOutput>true</consoleOutput>
+            <failOnViolation>${checkstyle.failOnViolation}</failOnViolation>
+            <configLocation>checkstyle/checkstyle.xml</configLocation>
+            <includeTestSourceDirectory>false</includeTestSourceDirectory>
+            <excludes>
+              **/generated/**,
+              **/generated-sources/**,
+              **/target/generated-sources/**
+            </excludes>
+          </configuration>
+          <executions>
+            <execution>
+              <id>checkstyle-verify</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <configuration>
+                <skip>${checkstyle.skip}</skip>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>com.github.spotbugs</groupId>
+          <artifactId>spotbugs-maven-plugin</artifactId>
+          <version>${plugin.version.spotbugs}</version>
+          <dependencies>
+            <dependency>
+              <groupId>io.github.mohankandar.idp</groupId>
+              <artifactId>idp-build-config</artifactId>
+              <version>${idp.framework.version}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <skip>${spotbugs.skip}</skip>
+            <effort>Max</effort>
+            <threshold>Medium</threshold>
+            <failOnError>${spotbugs.failOnError}</failOnError>
+            <xmlOutput>true</xmlOutput>
+            <excludeFilterFile>${idp.spotbugs.filter.file}</excludeFilterFile>
+          </configuration>
+          <executions>
+            <execution>
+              <id>spotbugs-verify</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <configuration>
+                <skip>${spotbugs.skip}</skip>
+                <excludeFilterFile>${idp.spotbugs.filter.file}</excludeFilterFile>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- Spring Boot plugin (apps can enable; library modules can ignore) -->
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${plugin.version.spring-boot}</version>
+          <configuration>
+            <mainClass>${start-class}</mainClass>
+          </configuration>
+        </plugin>
+
+        <!-- Optional: produce clean, flattened POMs for library publication -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>flatten-maven-plugin</artifactId>
+          <version>${plugin.version.flatten}</version>
+          <configuration>
+            <flattenMode>oss</flattenMode>
+          </configuration>
+          <executions>
+            <execution>
+              <id>flatten</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>flatten</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>flatten-clean</id>
+              <phase>clean</phase>
+              <goals>
+                <goal>clean</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+
+    <profile>
+      <id>idp-framework-repo</id>
+      <activation>
+        <file>
+          <exists>${maven.multiModuleProjectDirectory}/.idp-framework-repo</exists>
+        </file>
+      </activation>
+      <properties>
+        <idp.spotbugs.filter.file>spotbugs/framework.xml</idp.spotbugs.filter.file>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>idp-jpa-app</id>
+      <activation>
+        <property>
+          <name>idp.spotbugs.jpa-entities</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <idp.spotbugs.filter.file>spotbugs/jpa-app.xml</idp.spotbugs.filter.file>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>integration-tests-enabled</id>
+      <activation>
+        <property>
+          <name>test.it.enabled</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <skipITs>false</skipITs>
+        <it.guard.skip>false</it.guard.skip>
+      </properties>
+    </profile>
+    <profile>
+      <id>local</id>
+      <properties>
+        <jacoco.skip>true</jacoco.skip>
+      </properties>
+    </profile>
+  </profiles>
+</project>

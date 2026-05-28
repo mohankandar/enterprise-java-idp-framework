@@ -1,0 +1,2 @@
+io.github.mohankandar.idp.partner.PartnerAutoConfiguration
+io.github.mohankandar.idp.partner.feign.PartnerFeignAutoConfiguration

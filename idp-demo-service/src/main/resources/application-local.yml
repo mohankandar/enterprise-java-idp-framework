@@ -1,0 +1,104 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:h2:mem:idp_demo;MODE=LEGACY;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+idp:
+  cache:
+    enabled: true
+  data:
+    redis:
+      embedded:
+        enabled: true
+        port: 6379
+        only-when-local-profile: true
+
+  security:
+    web:
+      permit-paths:
+        - /api/ping
+        - /api/token
+
+    api-key:
+      enabled: true
+      header: X-API-Key
+      value: local-key    # local default for convenience
+
+    token-endpoint:
+      enabled: true
+      allowed-profiles: "local"
+      # Token metadata
+      issuer: "idp-demo-local"
+      expiry-seconds: 900
+
+      # HS256 secret for signing tokens (for local only – override via env if desired)
+      # must be >= 32 bytes
+      hmac-secret: "${IDP_TOKEN_HMAC_SECRET:local-development-only-change-me-32-bytes-min}"
+
+      # Restrict callers by CIDR – only localhost here - empty ⇒ no IP restriction.
+      allowed-cidrs:
+        - "127.0.0.1/32"
+
+  debug:
+    log-headers: true
+
+  partners:
+    services:
+      hello:
+        type: SOAP
+        soap:
+          endpoint: https://apps.learnwebservices.com/services/hello
+          connectTimeoutMs: 3000
+          readTimeoutMs: 15000
+          proxy:
+            enabled: false
+
+      external-echo:
+        type: REST
+        rest:
+          baseUrl: https://httpbin.org
+          connectTimeoutMs: 1000
+          readTimeoutMs: 5000
+          auth:
+            mode: NONE
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,env,loggers"
+  health:
+    redis:
+      enabled: false
+
+logging:
+  level:
+    root: INFO
+    io.github.mohankandar.idp.demo: DEBUG
+    io.github.mohankandar.idp.security: DEBUG
+    io.github.mohankandar.idp.platform: DEBUG
+    org.springframework.security: DEBUG
+    io.github.mohankandar.idp.demo.debug: DEBUG
+    org.springframework.boot.context.properties: DEBUG
+    org.springframework.cache: TRACE
